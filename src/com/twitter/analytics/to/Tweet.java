@@ -20,6 +20,11 @@ public class Tweet {
 		this.dataCriacao = dataCriacao;
 	}
 
+	@Override
+	public String toString() {
+		return "Tweet [Nome = " + nome + ", Data de Criação=" + dataCriacao + ", Tweet = " + mensagem  + "]";
+	}
+	
 
 	public String getNome() {
 		return nome;
@@ -49,6 +54,9 @@ public class Tweet {
 	public void setDataCriacao(Date dataCriacao) {
 		this.dataCriacao = dataCriacao;
 	}
+
+
+
 	
 
 	

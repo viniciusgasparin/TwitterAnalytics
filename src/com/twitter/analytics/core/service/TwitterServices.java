@@ -1,13 +1,11 @@
 package com.twitter.analytics.core.service;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
+import com.twitter.analytics.core.Utils;
 import com.twitter.analytics.core.connection.TwitterConnection;
 import com.twitter.analytics.to.Tweet;
 
@@ -28,24 +26,25 @@ public class TwitterServices {
 		Query query = new Query(hashtag);
 		
 		LocalDateTime dataInicio = LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		DateTimeFormatter dataIngles = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		DateTimeFormatter dataPortugues = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		dataInicio = dataInicio.plusDays(-6);
 
 		QueryResult result;
 
+		List<Tweet> listaTweets = new ArrayList();
+		
 		while (LocalDateTime.now().isAfter(dataInicio)) {
 			
 			int qtdeRetweets = 0;
 			int qtdeFavoritacoes = 0;
 		
-			query.setSince(dataInicio.format(formatter));
+			query.setSince(dataInicio.format(dataIngles));
 			dataInicio = dataInicio.plusDays(1);
-			query.setUntil(dataInicio.format(formatter));
+			query.setUntil(dataInicio.format(dataIngles));
 			
 			result = twitter.search(query);
-			
-			List<Tweet> listaTweets = new ArrayList();
-			
+		
 			if (result != null && !result.getTweets().isEmpty()) {
 				
 				for (Status status : result.getTweets()) {
@@ -54,17 +53,21 @@ public class TwitterServices {
 					qtdeRetweets += status.getRetweetCount();
 					qtdeFavoritacoes += status.getFavoriteCount();
 				}
-				
-				System.out.println("Tweets dia " + dataInicio.plusDays(-1).format(formatter) + ": " + result.getTweets().size());
-				System.out.println("Retweets dia " + dataInicio.plusDays(-1).format(formatter) + ": " + qtdeRetweets);
-				System.out.println("Favoritações dia " + dataInicio.plusDays(-1).format(formatter) + ": " + qtdeFavoritacoes);
+			
 				System.out.println("---------------------------------------------");
-				
+				System.out.println("Tweets dia " + dataInicio.plusDays(-1).format(dataPortugues) + ": " + result.getTweets().size());
+				System.out.println("Retweets dia " + dataInicio.plusDays(-1).format(dataPortugues) + ": " + qtdeRetweets);
+				System.out.println("Favoritações dia " + dataInicio.plusDays(-1).format(dataPortugues) + ": " + qtdeFavoritacoes);
+				System.out.println("---------------------------------------------");
+			}			
 
-			}
 		}
+		
+		this.imprimirItensOrdenados(listaTweets);
 	}
 
+	
+	
 	public void enviarTweet(String mensagemTweet) throws TwitterException {
 
 		Twitter twitter = new TwitterConnection().openConnection();
@@ -74,6 +77,7 @@ public class TwitterServices {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	public void enviarMensagemDireta() throws TwitterException {
 
 		Twitter twitter = new TwitterConnection().openConnection();
@@ -82,4 +86,25 @@ public class TwitterServices {
 		System.out.println("Sent: " + message.getText() + " to @" + message.getRecipientScreenName());
 	}
 
+	private void imprimirItensOrdenados(List<Tweet> listaTweets) {
+		
+		Utils.ordenarPorNome(listaTweets);
+		
+		System.out.println("--- Lista Ordenada por Nome ---");
+		System.out.println("    Primeiro tweet: " + listaTweets.stream().findFirst().get());
+		System.out.println("    ---------------------------------------------");
+		
+		System.out.println("    Ultimo tweet: " + listaTweets.get(listaTweets.size() - 1));
+		System.out.println("    ---------------------------------------------");
+		
+		Utils.ordenarPorData(listaTweets);
+		
+		System.out.println("--- Lista Ordenada por Data ---");
+		System.out.println("    Primeiro tweet: " + listaTweets.stream().findFirst().get());
+		System.out.println("    ---------------------------------------------");
+		
+		System.out.println("    Ultimo tweet: " + listaTweets.get(listaTweets.size() - 1));
+		System.out.println("---------------------------------------------");
+	}
+	
 }
