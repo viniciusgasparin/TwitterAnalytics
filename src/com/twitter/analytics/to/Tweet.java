@@ -22,7 +22,7 @@ public class Tweet {
 
 	@Override
 	public String toString() {
-		return "Tweet [Nome = " + nome + ", Data de Criação=" + dataCriacao + ", Tweet = " + mensagem  + "]";
+		return "Tweet [Nome = " + nome + ", Data de Criação=" + dataCriacao + "]";
 	}
 	
 

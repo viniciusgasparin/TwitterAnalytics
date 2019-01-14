@@ -13,8 +13,6 @@ public class Executor {
 		try {
 
 			new TwitterServices().buscarTweetsPorHashtag(HASH_TAG);
-			
-			new TwitterServices().enviarTweet("Projeto de conclusão da matéria JAVA executado com sucesso!  @michelpf");
 	
 		} catch (TwitterException e) {
 			

@@ -21,6 +21,8 @@ public class TwitterServices {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void buscarTweetsPorHashtag(String hashtag) throws TwitterException {
 
+		this.enviarTweet("Projeto de conclusão da matéria JAVA executado com sucesso! Ínicio do envio de dados #java8");
+		
 		Twitter twitter = new TwitterConnection().openConnection();
 
 		Query query = new Query(hashtag);
@@ -35,6 +37,8 @@ public class TwitterServices {
 		List<Tweet> listaTweets = new ArrayList();
 		
 		while (LocalDateTime.now().isAfter(dataInicio)) {
+			
+			StringBuffer sBuffer = new StringBuffer();
 			
 			int qtdeRetweets = 0;
 			int qtdeFavoritacoes = 0;
@@ -59,11 +63,18 @@ public class TwitterServices {
 				System.out.println("Retweets dia " + dataInicio.plusDays(-1).format(dataPortugues) + ": " + qtdeRetweets);
 				System.out.println("Favoritações dia " + dataInicio.plusDays(-1).format(dataPortugues) + ": " + qtdeFavoritacoes);
 				System.out.println("---------------------------------------------");
+				
+				sBuffer.append("Tweets dia " + dataInicio.plusDays(-1).format(dataPortugues) + ": " + result.getTweets().size() + "\n");
+				sBuffer.append("Retweets dia " + dataInicio.plusDays(-1).format(dataPortugues) + ": " + qtdeRetweets + "\n");
+				sBuffer.append("Favoritações dia " + dataInicio.plusDays(-1).format(dataPortugues) + ": " + qtdeFavoritacoes + "\n");
+				
+				this.enviarTweet(sBuffer.toString());
 			}			
 
 		}
 		
 		this.imprimirItensOrdenados(listaTweets);
+
 	}
 
 	
@@ -72,7 +83,7 @@ public class TwitterServices {
 
 		Twitter twitter = new TwitterConnection().openConnection();
 
-		Status status = twitter.updateStatus(mensagemTweet);
+		Status status = twitter.updateStatus(mensagemTweet.concat(" @michelpf"));
 		System.out.println("Tweet postado com sucesso! [" + status.getText() + "].");
 
 	}
@@ -86,7 +97,7 @@ public class TwitterServices {
 		System.out.println("Sent: " + message.getText() + " to @" + message.getRecipientScreenName());
 	}
 
-	private void imprimirItensOrdenados(List<Tweet> listaTweets) {
+	private void imprimirItensOrdenados(List<Tweet> listaTweets) throws TwitterException{
 		
 		Utils.ordenarPorNome(listaTweets);
 		
@@ -97,6 +108,13 @@ public class TwitterServices {
 		System.out.println("    Ultimo tweet: " + listaTweets.get(listaTweets.size() - 1));
 		System.out.println("    ---------------------------------------------");
 		
+		StringBuffer sBuffer = new StringBuffer();
+		
+		sBuffer.append("Lista por Nome = ");
+		sBuffer.append("1º:" + listaTweets.stream().findFirst().get().getNome());
+		sBuffer.append("Ultimo: " + listaTweets.get(listaTweets.size() - 1).getNome() + "\n");
+		
+		
 		Utils.ordenarPorData(listaTweets);
 		
 		System.out.println("--- Lista Ordenada por Data ---");
@@ -105,6 +123,12 @@ public class TwitterServices {
 		
 		System.out.println("    Ultimo tweet: " + listaTweets.get(listaTweets.size() - 1));
 		System.out.println("---------------------------------------------");
+		
+		sBuffer.append("Lista por Data = ");
+		sBuffer.append("1º:" + listaTweets.stream().findFirst().get().getDataCriacao());
+		sBuffer.append("Ultimo: " + listaTweets.get(listaTweets.size() - 1).getDataCriacao() + "\n");
+		
+		this.enviarTweet(sBuffer.toString());
 	}
 	
 }
